@@ -11,6 +11,9 @@ let reloadTimeout = 0;
 let infoPrefix = "[FiveM DevBridge] ";
 
 
+const checkRegex = /(?:\\|\/)(resources)(?:\\|\/)/i
+
+
 function showErrorMessage(message) {
   vscode.window.showErrorMessage("[FiveM DevBridge] " + message);
 }
@@ -118,6 +121,7 @@ function setConnectionStatus(status) {
 
 
 function activate(context) {
+  console.log(context)
   // Check for saved connection at startup
   const workspaceState = context.workspaceState;
   vscodeWorkspaceState = workspaceState;
@@ -143,19 +147,14 @@ function activate(context) {
   // Event: Save Text Document 
   // TODO: Only restart script if the saved file is in the current resource folder
   vscode.workspace.onDidSaveTextDocument((document) => {
+    console.log(document)
     if (document.uri.scheme === "file" && rconConnection) {
-
-      if (currentFolder) {
+      if (currentFolder && checkRegex.test(document.uri.path) && document.uri.path.includes(currentFolder)) {
         setTimeout(() => {
           rconConnection.send(`refresh; ensure ${currentFolder}`);
         }, reloadTimeout);
-
       } else {
-        vscode.workspace.workspaceFolders.forEach((folder) => {
-          setTimeout(() => {
-            rconConnection.send(`refresh; ensure ${folder.name}`);
-          }, reloadTimeout);
-        });
+        showErrorMessage(`You need specify the resource to refresh.`);
       }
     }
   });
