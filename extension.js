@@ -120,8 +120,7 @@ function setConnectionStatus(status) {
 }
 
 
-function activate(context) {
-  console.log(context)
+function activate(context) {  
   // Check for saved connection at startup
   const workspaceState = context.workspaceState;
   vscodeWorkspaceState = workspaceState;
@@ -144,10 +143,7 @@ function activate(context) {
     connectToSaved();
   }
 
-  // Event: Save Text Document 
-  // TODO: Only restart script if the saved file is in the current resource folder
-  vscode.workspace.onDidSaveTextDocument((document) => {
-    console.log(document)
+  vscode.workspace.onDidSaveTextDocument((document) => {    
     if (document.uri.scheme === "file" && rconConnection) {
       if (currentFolder && checkRegex.test(document.uri.path) && document.uri.path.includes(currentFolder)) {
         setTimeout(() => {
